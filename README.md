@@ -1,8 +1,34 @@
-fis3-command-npm
-====================
+# weg-command-server
 
-- fis3 npm install 安装node_modules 依赖
+## Usage
 
-- fis3 npm start   启动bin/www
+```
+  Usage: server <command> [options]
 
-- fis3 npm app.js  node app.js 启动应用
+  Commands:
+
+    start                  start server
+    stop                   shutdown server
+    restart                restart server
+    info                   output server info
+    open                   open document root directory
+    clean                  clean files in document root
+    install <name>         install server framework
+
+  Options:
+
+    -h, --help                     output usage information
+    -p, --port <int>               server listen port
+    --root <path>                  document root
+    --type <php|java|node>         process language
+    --rewrite [script]             enable rewrite mode
+    --repos <url>                  install repository
+    --timeout <seconds>            start timeout
+    --php_exec <path>              path to php-cgi executable file
+    --php_exec_args <args>         php-cgi arguments
+    --php_fcgi_children <int>      the number of php-cgi processes
+    --php_fcgi_max_requests <int>  the max number of requests
+    --registry <registry>          set npm registry
+    --include <glob>               clean include filter
+    --exclude <glob>               clean exclude filter
+```

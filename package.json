@@ -1,22 +1,31 @@
 {
-  "name": "fis3-command-npm",
-  "version": "0.0.1",
-  "description": "fis3 自动安装node_modules",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/hubcarl/fis3-command-npm"
+  "name": "weg-command-server",
+  "description": "weg server command.",
+  "version": "0.0.7",
+  "author": {
+    "name": "sky",
+    "email": "hubcarl@126.com"
   },
   "keywords": [
-    "fis3",
-    "server"
+    "fis",
+    "weg"
   ],
-  "author": "sky",
-  "bugs": {
-    "url": "https://github.com/hubcarl/fis3-command-npm/issues"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hubcarl/weg-command-server.git"
   },
-  "homepage": "https://github.com/hubcarl/fis3-command-npm"
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "main": "server.js",
+  "scripts": {
+    "test": "mocha test/ut --recursive",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "chokidar": "~1.0.1",
+    "resolve": "1.1.6",
+    "step": "0.0.5",
+    "tar": "2.1.1"
+  }
 }
