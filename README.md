@@ -20,6 +20,7 @@
     -h, --help                     output usage information
     -p, --port <int>               server listen port
     --root <path>                  document root
+    --entry <path>                 node start file(weg server start --entry app.js   default entry:server.js)
     --type <php|java|node>         process language
     --rewrite [script]             enable rewrite mode
     --repos <url>                  install repository
