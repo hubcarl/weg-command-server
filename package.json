@@ -1,7 +1,7 @@
 {
   "name": "weg-command-server",
   "description": "weg server command.",
-  "version": "0.0.7",
+  "version": "0.1.0",
   "author": {
     "name": "sky",
     "email": "hubcarl@126.com"
@@ -27,5 +27,35 @@
     "resolve": "1.1.6",
     "step": "0.0.5",
     "tar": "2.1.1"
-  }
+  },
+  "gitHead": "2c8fb823edc6a21bf1c4e9f23e41db21d43e6656",
+  "bugs": {
+    "url": "https://github.com/hubcarl/weg-command-server/issues"
+  },
+  "homepage": "https://github.com/hubcarl/weg-command-server#readme",
+  "_id": "weg-command-server@0.0.8",
+  "_shasum": "0ec1c911bf589a125e0727429a86cace4f377e57",
+  "_from": "weg-command-server@latest",
+  "_npmVersion": "2.14.7",
+  "_nodeVersion": "4.2.3",
+  "_npmUser": {
+    "name": "hubcarl",
+    "email": "hubcarl@126.com"
+  },
+  "dist": {
+    "shasum": "0ec1c911bf589a125e0727429a86cace4f377e57",
+    "tarball": "https://registry.npmjs.org/weg-command-server/-/weg-command-server-0.0.8.tgz"
+  },
+  "maintainers": [
+    {
+      "name": "hubcarl",
+      "email": "hubcarl@126.com"
+    }
+  ],
+  "_npmOperationalInternal": {
+    "host": "packages-16-east.internal.npmjs.com",
+    "tmp": "tmp/weg-command-server-0.0.8.tgz_1460190884485_0.7160852977540344"
+  },
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/weg-command-server/-/weg-command-server-0.0.8.tgz"
 }
