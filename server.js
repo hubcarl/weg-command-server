@@ -82,8 +82,8 @@ exports.register = function(commander) {
     var serverRoot = getServerRoot();
 
     commander
-        .option('-p, --port <int>', 'server listen port', parseInt, process.env.FIS_SERVER_PORT || 8080)
-        .option('--entry <path>', 'node app entry file')
+        .option('-p, --port <int>', 'server listen port', parseInt, process.env.FIS_SERVER_PORT || 9999)
+        .option('--entry <path>', 'node app entry file,default server.js')
         .option('--root <path>', 'document root')
         .option('--type <php|java|node>', 'process language', String, fis.config.get('server.type'))
         .option('--rewrite [script]', 'enable rewrite mode', String, fis.config.get('server.rewrite', false))
