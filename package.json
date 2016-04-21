@@ -1,7 +1,7 @@
 {
   "name": "weg-command-server",
   "description": "weg server command.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": {
     "name": "sky",
     "email": "hubcarl@126.com"
