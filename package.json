@@ -1,14 +1,15 @@
 {
   "name": "weg-command-server",
   "description": "weg server command.",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "author": {
     "name": "sky",
     "email": "hubcarl@126.com"
   },
   "keywords": [
     "fis",
-    "weg"
+    "fis3 node server",
+    "weg node server"
   ],
   "repository": {
     "type": "git",
