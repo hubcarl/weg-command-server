@@ -6,6 +6,8 @@
 'use strict';
 
 var server = require('./lib/server.js');
+var release = require('./lib/release/index.js');
+
 var path = require('path');
 
 exports.name = 'server';
@@ -83,178 +85,201 @@ exports.register = function (commander) {
     var serverRoot = getServerRoot();
 
     commander
-        .option('-p, --port <int>', 'server listen port', parseInt, process.env.FIS_SERVER_PORT || 9999)
-        .option('--entry <path>', 'node app entry file,default server.js')
-        .option('--root <path>', 'document root')
-        .option('--type <php|java|node>', 'process language', String, fis.config.get('server.type'))
-        .option('--rewrite [script]', 'enable rewrite mode', String, fis.config.get('server.rewrite', false))
-        .option('--repos <url>', 'install repository', String, process.env.FIS_SERVER_REPOSITORY)
-        .option('--timeout <seconds>', 'start timeout', parseInt, 15)
-        .option('--php_exec <path>', 'path to php-cgi executable file', String, 'php-cgi')
-        .option('--php_exec_args <args>', 'php-cgi arguments', String)
-        .option('--php_fcgi_children <int>', 'the number of php-cgi processes', parseInt)
-        .option('--php_fcgi_max_requests <int>', 'the max number of requests', parseInt)
-        .option('--registry <registry>', 'set npm registry', 'https://registry.npmjs.org')
-        .option('--include <glob>', 'clean include filter', Array)
-        .option('--exclude <glob>', 'clean exclude filter', Array)
-        .option('--https', 'start https server')
-        .action(function () {
-            var args = Array.prototype.slice.call(arguments);
-            var options = args.pop();
-            var cmd = args.shift();
-            if (options.rewrite) {
-                if (options.rewrite != true) {
-                    options.script = options.rewrite;
-                    options.rewrite = true;
-                }
-            }
+      .option('-p, --port <int>', 'server listen port', parseInt, process.env.FIS_SERVER_PORT || 9999)
+      .option('--entry <path>', 'node app entry file,default server.js')
+      .option('--root <path>', 'document root')
+      .option('--type <php|java|node>', 'process language', String, fis.config.get('server.type'))
+      .option('--rewrite [script]', 'enable rewrite mode', String, fis.config.get('server.rewrite', false))
+      .option('--repos <url>', 'install repository', String, process.env.FIS_SERVER_REPOSITORY)
+      .option('--timeout <seconds>', 'start timeout', parseInt, 15)
+      .option('--php_exec <path>', 'path to php-cgi executable file', String, 'php-cgi')
+      .option('--php_exec_args <args>', 'php-cgi arguments', String)
+      .option('--php_fcgi_children <int>', 'the number of php-cgi processes', parseInt)
+      .option('--php_fcgi_max_requests <int>', 'the max number of requests', parseInt)
+      .option('--registry <registry>', 'set npm registry', 'https://registry.npmjs.org')
+      .option('--include <glob>', 'clean include filter', Array)
+      .option('--exclude <glob>', 'clean exclude filter', Array)
+      .option('--https', 'start https server')
+      .action(function () {
+          var args = Array.prototype.slice.call(arguments);
+          var options = args.pop();
+          var cmd = args.shift();
+          if (options.rewrite) {
+              if (options.rewrite != true) {
+                  options.script = options.rewrite;
+                  options.rewrite = true;
+              }
+          }
 
-            var originRoot = options.root;
-            if (!options.root) {
-                options.root = getRoot(getServerRoot());
-            } else {
-                options.root = getRoot(options.root);
-            }
-            var root = options.root;
+          var originRoot = options.root;
+          if (!options.root) {
+              options.root = getRoot(getServerRoot());
+          } else {
+              options.root = getRoot(options.root);
+          }
+          var root = options.root;
 
 
-            if (root) {
-                if (fis.util.exists(root) && !fis.util.isDir(root)) {
-                    fis.log.error('invalid document root [' + root + ']');
-                } else {
-                    fis.util.mkdir(root);
-                }
-            } else {
-                fis.log.error('missing document root');
-            }
+          if (root) {
+              if (fis.util.exists(root) && !fis.util.isDir(root)) {
+                  fis.log.error('invalid document root [' + root + ']');
+              } else {
+                  fis.util.mkdir(root);
+              }
+          } else {
+              fis.log.error('missing document root');
+          }
 
-            function download(names) {
-                if ((typeof names === 'string') && names.trim().length > 0) {
-                    var remote = options.repos || fis.config.get(
-                            'system.repos', fis.project.DEFAULT_REMOTE_REPOS
-                        ).replace(/\/$/, '') + '/server';
-                    var option = {
-                        extract: options['root'],
-                        remote: remote
-                    };
-                    names.split(',').forEach(function (name) {
-                        name = name.split('@');
-                        fis.util.install(name[0], name[1], option);
-                    });
-                } else {
-                    fis.log.error('invalid server component name');
-                }
-            }
+          function download(names) {
+              if ((typeof names === 'string') && names.trim().length > 0) {
+                  var remote = options.repos || fis.config.get(
+                      'system.repos', fis.project.DEFAULT_REMOTE_REPOS
+                    ).replace(/\/$/, '') + '/server';
+                  var option = {
+                      extract: options['root'],
+                      remote: remote
+                  };
+                  names.split(',').forEach(function (name) {
+                      name = name.split('@');
+                      fis.util.install(name[0], name[1], option);
+                  });
+              } else {
+                  fis.log.error('invalid server component name');
+              }
+          }
 
-            switch (cmd) {
-                case 'start':
-                    var opt = {};
-                    fis.util.map(options, function (key, value) {
-                        if (typeof value !== 'object' && key[0] !== '_') {
-                            opt[key] = value;
-                        }
-                    });
-                    server.stop(function () {
-                        // 如果要修改 root 每次都得指定，否则以后还不回来了。
-                        deleteServerInfo();
-                        originRoot || (opt.root = getRoot(getServerRoot()));
-                        server.start(opt);
-                    });
-                    break;
-                case 'stop':
-                    server.stop(function () {
+          switch (cmd) {
+              case 'run':
 
-                    });
-                    break;
-                case 'restart':
-                    server.stop(server.start);
-                    break;
-                case 'install':
-                    var names = args.shift();
-                    download(names);
-                    break;
-                case 'info':
-                    server.info();
-                    break;
-                case 'open':
-                    server.open(root);
-                    break;
-                case 'clean':
-                    process.stdout.write(' δ '.bold.yellow);
-                    var now = Date.now();
-                    var include = options.include || fis.config.get('server.clean.include');
-                    var exclude = options.exclude || fis.config.get('server.clean.exclude');
+                  release.run({watch:true}, fis.cli, {}, function(options,next){
+                      var opt = {};
+                      fis.util.map(options, function (key, value) {
+                          if (typeof value !== 'object' && key[0] !== '_') {
+                              opt[key] = value;
+                          }
+                      });
+                      server.stop(function () {
+                          // 如果要修改 root 每次都得指定，否则以后还不回来了。
+                          deleteServerInfo();
+                          originRoot || (opt.root = getRoot(getServerRoot()));
+                          server.start(opt);
+                      });
+                      next(null, options);
+                  });
 
-                    if (/all/i.test(include) || options.exclude == '') {
-                        include = undefined;
-                        exclude = undefined;
-                    }
+                  break;
+              case 'start':
+                  var opt = {};
+                  fis.util.map(options, function (key, value) {
+                      if (typeof value !== 'object' && key[0] !== '_') {
+                          opt[key] = value;
+                      }
+                  });
+                  server.stop(function () {
+                      // 如果要修改 root 每次都得指定，否则以后还不回来了。
+                      deleteServerInfo();
+                      originRoot || (opt.root = getRoot(getServerRoot()));
+                      server.start(opt);
+                  });
+                  break;
+              case 'stop':
+                  server.stop(function () {
 
-                    include = typeof include == 'string' ? [include] : include;
-                    exclude = typeof exclude == 'string' ? [exclude] : exclude;
-                    if (include) {
-                        include = include.map(function (reg) {
-                            return path.join(root, reg);
-                        });
-                    }
+                  });
+                  break;
+              case 'restart':
+                  server.stop(server.start);
+                  break;
+              case 'install':
+                  var names = args.shift();
+                  download(names);
+                  break;
+              case 'info':
+                  server.info();
+                  break;
+              case 'open':
+                  server.open(root);
+                  break;
+              case 'clean':
+                  process.stdout.write(' δ '.bold.yellow);
+                  var now = Date.now();
+                  var include = options.include || fis.config.get('server.clean.include');
+                  var exclude = options.exclude || fis.config.get('server.clean.exclude');
 
-                    if (exclude) {
-                        exclude = exclude.map(function (reg) {
-                            return path.join(root, reg);
-                        });
-                    }
+                  if (/all/i.test(include) || options.exclude == '') {
+                      include = undefined;
+                      exclude = undefined;
+                  }
 
-                    fis.util.del(root, include, exclude);
+                  include = typeof include == 'string' ? [include] : include;
+                  exclude = typeof exclude == 'string' ? [exclude] : exclude;
+                  if (include) {
+                      include = include.map(function (reg) {
+                          return path.join(root, reg);
+                      });
+                  }
 
-                    process.stdout.write((Date.now() - now + 'ms').green.bold);
-                    process.stdout.write('\n');
-                    break;
-                case 'init':
-                    var libs = fis.config.get('server.libs');
-                    if (fis.util.is(libs, 'Array')) {
-                        libs.forEach(function (name) {
-                            download(name);
-                        });
-                    } else if (fis.util.is(libs, 'String')) {
-                        download(libs);
-                    }
-                    break;
-                default :
-                    commander.help();
-            }
-        });
+                  if (exclude) {
+                      exclude = exclude.map(function (reg) {
+                          return path.join(root, reg);
+                      });
+                  }
 
-    commander
-        .command('start')
-        .description('start server');
+                  fis.util.del(root, include, exclude);
 
-    commander
-        .command('stop')
-        .description('shutdown server');
-
-    commander
-        .command('restart')
-        .description('restart server');
-
-    commander
-        .command('info')
-        .description('output server info');
-
-    commander
-        .command('open')
-        .description('open document root directory');
-
-    commander
-        .command('clean')
-        .description('clean files in document root');
+                  process.stdout.write((Date.now() - now + 'ms').green.bold);
+                  process.stdout.write('\n');
+                  break;
+              case 'init':
+                  var libs = fis.config.get('server.libs');
+                  if (fis.util.is(libs, 'Array')) {
+                      libs.forEach(function (name) {
+                          download(name);
+                      });
+                  } else if (fis.util.is(libs, 'String')) {
+                      download(libs);
+                  }
+                  break;
+              default :
+                  commander.help();
+          }
+      });
 
     commander
-        .command('install <name>')
-        .description('install server framework');
+      .command('run')
+      .description('release watch and start server');
+
+    commander
+      .command('start')
+      .description('start server');
+
+    commander
+      .command('stop')
+      .description('shutdown server');
+
+    commander
+      .command('restart')
+      .description('restart server');
+
+    commander
+      .command('info')
+      .description('output server info');
+
+    commander
+      .command('open')
+      .description('open document root directory');
+
+    commander
+      .command('clean')
+      .description('clean files in document root');
+
+    commander
+      .command('install <name>')
+      .description('install server framework');
 
     if (fis.config.get('server.libs')) {
         commander
-            .command('init')
-            .description('initialize server framework');
+          .command('init')
+          .description('initialize server framework');
     }
 };
