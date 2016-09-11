@@ -3,9 +3,13 @@
 ## 相比fis3支持如下特性
 
 1.插件weg-command-server 解决了fis3的默认server不自动安装package.json依赖问题.
+
 2.插件weg-command-server 解决了fis3不能指定node启动入口文件，weg server start –entry app.js.
+
 3.插件weg-command-server 支持控制台或者命令行显示log日志功能.
+
 4.插件weg-command-server 支持了监听服务器文件修改自动重启node server的功能.
+
 
 ## Usage
 
